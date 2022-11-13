@@ -1,0 +1,194 @@
+###########################################
+#
+# Author: Brett Buckner, Nicholas Buchanan
+# Date: Fall 2022
+#
+# Takes a 4 digit integer from the user
+# Shows the user the sum of all 4 digits
+# Then prints it in reverse
+#
+###########################################
+
+
+.data
+
+prompt: .asciiz "Please enter an Integer > " 
+endPrompt: .asciiz "The String backwords is: > "
+plus_str: .asciiz " + "
+equal_str: .asciiz " = "
+num: .space 8
+revNum: .space 8
+
+# Newline 
+newLine:	.asciiz "\n"
+
+.text
+
+.globl main
+
+main:
+ 
+	####################################
+	#
+	# $s registers used for loading position of desired number for input 
+	# $t registers used for basic arithmetic, masking	
+	#
+	#
+	####################################
+
+	# Print prompt
+	la $a0, prompt # address of string to print
+	li $v0, 4
+	syscall
+
+	# Input integer
+	la $a0, num # address to store string at
+	li $a1, 8 # maximum number of chars (including '\0')
+	li $v0, 8
+	syscall
+
+	 # Print integer - Not part of the project, just use for debugging
+	 # la $a0, num # address of string to print - stored in mem here
+	 # li $v0, 4
+	 # syscall
+
+	# MASK USED FOR CONVERTING ASCII TO INT
+	 li $t6, 0x0F
+
+	# FIRST CHARACTER
+	la $a1, num #Load the address of the string
+	li $s0, 0 #Load the position of the first character = num[0]
+	add $a1,$a1,$s0 #Add that to offset the address
+	lbu $t1,($a1) #Load the particular bit into a register
+	and $t1, $t1, $t6 #Mask it to leave the integer value
+		
+	li $v0, 1 # Print it
+	move $a0, $t1
+	syscall
+
+	# PRINT " + "
+    li $v0, 4
+    la $a0, plus_str
+    syscall
+
+	# SECOND CHARACTER
+	 la $a1, num #Load the address of the string
+	 li $s0, 1 #Load the position of the first character = num[1]
+	 add $a1,$a1,$s0 #Add that to offset the address
+	 lbu $t2,($a1) #Load the particular bit into a register
+	 and $t2, $t2, $t6 #Mask it to leave the integer value
+		
+	 li $v0, 1 #Print it
+	 move $a0, $t2
+	 syscall
+
+	# PRINT " + "
+	li $v0, 4
+	la $a0, plus_str
+	syscall
+
+	# THIRD CHARACTER
+	la $a1, num #Load the address of the string
+	li $s0, 2 #Load the position of the first character = num[2]
+	add $a1,$a1,$s0 #Add that to offset the address
+	lbu $t3,($a1)  #Load the particular bit into a register
+	and $t3, $t3, $t6 #Mask it to leave the integer value
+		
+	li $v0, 1 #Print it
+	move $a0, $t3
+	syscall
+
+	# PRINT " + "
+    li $v0, 4
+    la $a0, plus_str
+    syscall
+
+	# FOURTH CHARACTER
+	la $a1, num #Load the address of the string
+	li $s0, 3 #Load the position of the first character = num[3]
+	add $a1,$a1,$s0 #Add that to offset the address
+	lbu $t4,($a1) #Load the particular bit into a register
+	and $t4, $t4, $t6 #Mask it to leave the integer value
+		
+	li $v0, 1 #Print it
+	move $a0, $t4
+	syscall
+			
+	# PRINT " = "
+	li $v0, 4
+	la $a0, equal_str
+	syscall
+
+	# ADD ALL THE INTEGERS TOGETHER
+	add $s1, $t1, $t2
+	add $s1, $s1, $t3
+	add $s1, $s1, $t4
+
+	li $v0, 1 #Print it
+	move $a0, $s1
+	syscall
+
+	###PRINTING IN REVERSE
+
+	# PRINT NEWLINE
+
+	la $a0, newLine # address of string to print
+	li $v0, 4
+	syscall
+
+	# PRINT ENDPROMPT
+
+	la $a0, endPrompt # address of string to print
+	li $v0, 4
+	syscall
+
+	# FOURTH CHARACTER REVERSED
+
+	la $a1, num #Load the address of the string
+	li $s0, 3 #Load the position of the last character = num[3]
+	add $a1,$a1,$s0 #Add that to offset the address
+	lbu $t1,($a1) #Load the particular bit into a register
+	and $t1, $t1, $t6 #Mask it to leave the integer value
+		
+	li $v0, 1 #Print it
+	move $a0, $t1
+	syscall
+
+
+
+	# THIRD CHARACTER REVERSED
+	 la $a1, num #Load the address of the string
+	 li $s0, 2 #Load the position of the second to last character = num[2]
+	 add $a1,$a1,$s0 #Add that to offset the address
+	 lbu $t2,($a1) #Load the particular bit into a register
+	 and $t2, $t2, $t6 #Mask it to leave the integer value
+		
+	 li $v0, 1 #Print it
+	 move $a0, $t2
+	 syscall
+
+	# SECOND CHARACTER REVERSED
+	la $a1, num # Load the address of the string
+	li $s0, 1 # Load the position of the first character = num[1]
+	add $a1,$a1,$s0 # Add that to offset the address
+	lbu $t3,($a1)  # Load the particular bit into a register
+	and $t3, $t3, $t6 # Mask it to leave the integer value
+		
+	li $v0, 1 #Print it
+	move $a0, $t3
+	syscall
+
+	# FIRST CHARACTER REVERSED
+	la $a1, num	 # Load the address of the string
+	li $s0, 0	 # Load the position of the first character = num[0]
+	add $a1,$a1,$s0	 # Add that to offset the address
+	lbu $t4,($a1)	 # Load the particular bit into a register
+	and $t4, $t4, $t6 # Mask it to leave the integer value
+		
+	li $v0, 1	 #Print it
+	move $a0, $t4
+	syscall
+
+	# EXIT
+	li $v0, 10
+	syscall
